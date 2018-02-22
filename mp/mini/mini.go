@@ -37,21 +37,21 @@ func NewWechatMini(appId, secret string, client *http.Client) WechatMini {
 	}
 
 	return &wechatMini{
-		AppId:  appId,
-		Secret: secret,
+		appId:  appId,
+		secret: secret,
 		client: client,
 	}
 }
 
 type wechatMini struct {
-	AppId  string
-	Secret string
+	appId  string
+	secret string
 
 	client *http.Client
 }
 
 func (this *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error) {
-	url := fmt.Sprintf(get_sessionkey_url, this.AppId, this.Secret, jsCode)
+	url := fmt.Sprintf(get_sessionkey_url, this.appId, this.secret, jsCode)
 
 	result, err := this.client.Get(url)
 	if err != nil {
