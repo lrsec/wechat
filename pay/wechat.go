@@ -8,11 +8,14 @@ import (
 )
 
 type WechatPay interface {
+	GetNonceStr() string
+	Sign(param interface{}) (string, error)
+
 	Transfer(openId string, partnerTradeNo string, amount int64, checkName CheckNameMode, receiverName string, desc string) (*TransferResponse, error)
-	UnifiedOrder(openId, body, attach, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error)
+	UnifiedOrder(openId, body, attach, goodsTag, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error)
 }
 
-func NewUnSecureWechatPay(mchId, appId, apiSignKey string, nonceLen int, timeout time.Duration) (WechatPay, error) {
+func NewUnSecureWechatPay(mchId, appId, apiSignKey string, nonceLen int, timeout time.Duration) WechatPay {
 	if nonceLen > 32 {
 		nonceLen = 32
 	}
@@ -29,7 +32,7 @@ func NewUnSecureWechatPay(mchId, appId, apiSignKey string, nonceLen int, timeout
 		nonSecureClient: nonsecureClient,
 	}
 
-	return pay, nil
+	return pay
 
 }
 
@@ -86,6 +89,10 @@ type wechatPay struct {
 	apiPublicKey    string       //api 接口密钥，微信生成，通过后台下载
 	secureClient    *http.Client // 要求证书的请求
 	nonSecureClient *http.Client // 不要求证书的请求
+}
+
+func (pay *wechatPay) GetNonceStr() string {
+	return randString(pay.NonceLen)
 }
 
 type CheckNameMode string

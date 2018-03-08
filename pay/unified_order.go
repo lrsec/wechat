@@ -28,7 +28,7 @@ type unifiedOrderParam struct {
 	Mchid          string `xml:"mch_id"`
 	DeviceInfo     string `xml:"device_info"`
 	NonceStr       string `xml:"nonce_str"`
-	Sign           string `xml:"sign"`
+	Sign           string `xml:"Sign"`
 	Body           string `xml:"body"`
 	Detail         string `xml:"detail"`
 	Attach         string `xml:"attach"`
@@ -40,6 +40,7 @@ type unifiedOrderParam struct {
 	NotifyUrl      string `xml:"notify_url"`
 	TradeType      string `xml:"trade_type"`
 	Openid         string `xml:"openid"`
+	GoodsTag       string `xml:"goods_tag"`
 }
 
 type UnifiedOrderResponse struct {
@@ -49,7 +50,7 @@ type UnifiedOrderResponse struct {
 	MchId      string `xml:"mchid"`
 	DeviceInfo string `xml:"device_info"`
 	NonceStr   string `xml:"nonce_str"`
-	Sign       string `xml:"sign"`
+	Sign       string `xml:"Sign"`
 	ResultCode string `xml:"result_code"`
 	ErrCode    string `xml:"err_code"`
 	ErrCodeDes string `xml:"err_code_des"`
@@ -60,7 +61,7 @@ type UnifiedOrderResponse struct {
 }
 
 // 统一下单接口
-func (self *wechatPay) UnifiedOrder(openId, body, attach, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error) {
+func (self *wechatPay) UnifiedOrder(openId, body, attach, goodsTag, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error) {
 	param := &unifiedOrderParam{
 		AppId:          self.AppId,
 		Mchid:          self.mchId,
@@ -78,7 +79,7 @@ func (self *wechatPay) UnifiedOrder(openId, body, attach, outTradeNo string, tot
 		Openid:         openId,
 	}
 
-	sign, err := self.sign(param)
+	sign, err := self.Sign(param)
 	if err != nil {
 		return nil, err
 	}

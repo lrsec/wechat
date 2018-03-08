@@ -3,8 +3,6 @@ package pay
 import (
 	"strings"
 	"testing"
-
-	"code.inke.cn/boc/financial/fin-conversion/util/md5"
 )
 
 var (
@@ -17,7 +15,7 @@ var (
 
 func init() {
 	pay = &wechatPay{
-		apiSignKey: "test-sign-key",
+		apiSignKey: "test-Sign-key",
 	}
 
 	i := 10
@@ -42,9 +40,9 @@ func init() {
 
 	pParam = &param
 
-	wantStr = "b=true&f=11.1&i=10&pb=true&pf=11.1&pi=10&ps=test&s=test&key=test-sign-key"
+	wantStr = "b=true&f=11.1&i=10&pb=true&pf=11.1&pi=10&ps=test&s=test&key=test-Sign-key"
 
-	wantMd5 = strings.ToUpper(md5.Md5(wantStr))
+	wantMd5 = strings.ToUpper(md5Str(wantStr))
 
 }
 
@@ -63,22 +61,22 @@ type testParam struct {
 }
 
 func Test_wechatPay_sign(t *testing.T) {
-	result, err := pay.sign(param)
+	result, err := pay.Sign(param)
 	if err != nil {
-		t.Errorf("sign return err: %v", err)
+		t.Errorf("Sign return err: %v", err)
 	}
 
 	if result != wantMd5 {
-		t.Errorf("sign fail for struct. want: %v. get: %v", wantMd5, result)
+		t.Errorf("Sign fail for struct. want: %v. get: %v", wantMd5, result)
 	}
 
-	result, err = pay.sign(pParam)
+	result, err = pay.Sign(pParam)
 	if err != nil {
-		t.Errorf("sign return err: %v", err)
+		t.Errorf("Sign return err: %v", err)
 	}
 
 	if result != wantMd5 {
-		t.Errorf("sign fail for pointer. want: %v. get: %v", wantMd5, result)
+		t.Errorf("Sign fail for pointer. want: %v. get: %v", wantMd5, result)
 	}
 }
 

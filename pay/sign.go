@@ -1,6 +1,7 @@
 package pay
 
 import (
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"strings"
@@ -9,18 +10,18 @@ import (
 
 	"errors"
 
-	"code.inke.cn/boc/financial/fin-conversion/util/md5"
+	"crypto/md5"
 )
 
 /*
 微信签名规则，参见: https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=4_3
 */
-func (self *wechatPay) sign(param interface{}) (string, error) {
+func (self *wechatPay) Sign(param interface{}) (string, error) {
 
 	if content, err := self.genContentStr(param); err != nil {
 		return "", err
 	} else {
-		return strings.ToUpper(md5.Md5(content)), nil
+		return strings.ToUpper(md5Str(content)), nil
 	}
 }
 
@@ -28,7 +29,7 @@ func (self *wechatPay) genContentStr(param interface{}) (contentStr string, err 
 	defer func() {
 		if r := recover(); r != nil {
 			contentStr = ""
-			err = errors.New(fmt.Sprintf("sign panic. msg: %v", r))
+			err = errors.New(fmt.Sprintf("Sign panic. msg: %v", r))
 		}
 	}()
 
@@ -77,4 +78,12 @@ func (self *wechatPay) genContentStr(param interface{}) (contentStr string, err 
 	contentStr = contentStr + "key=" + self.apiSignKey
 
 	return contentStr, nil
+}
+
+func md5Str(origin string) string {
+	bytes := []byte(origin)
+	h := md5.New()
+	h.Write(bytes) // 需要加密的字符串为 123456
+	cipherStr := h.Sum(nil)
+	return hex.EncodeToString(cipherStr) // 输出加密结果
 }

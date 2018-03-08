@@ -37,7 +37,7 @@ type transferParam struct {
 	Mchid          string `xml:"mchid"`
 	DeviceInfo     string `xml:"device_info"`
 	NonceStr       string `xml:"nonce_str"`
-	Sign           string `xml:"sign"`
+	Sign           string `xml:"Sign"`
 	PartnerTradeNo string `xml:"partner_trade_no"`
 	Openid         string `xml:"openid"`
 	CheckName      string `xml:"check_name"`
@@ -68,7 +68,7 @@ func (self *wechatPay) Transfer(openId string, partnerTradeNo string, amount int
 		SPBillCreateIP: self.ip,
 	}
 
-	sign, err := self.sign(param)
+	sign, err := self.Sign(param)
 	if err != nil {
 		return nil, err
 	}
