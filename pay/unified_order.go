@@ -28,7 +28,7 @@ type unifiedOrderParam struct {
 	Mchid          string `xml:"mch_id"`
 	DeviceInfo     string `xml:"device_info"`
 	NonceStr       string `xml:"nonce_str"`
-	Sign           string `xml:"Sign"`
+	Sign           string `xml:"sign"`
 	Body           string `xml:"body"`
 	Detail         string `xml:"detail"`
 	Attach         string `xml:"attach"`
@@ -63,20 +63,19 @@ type UnifiedOrderResponse struct {
 // 统一下单接口
 func (self *wechatPay) UnifiedOrder(openId, body, attach, goodsTag, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error) {
 	param := &unifiedOrderParam{
-		AppId:          self.AppId,
-		Mchid:          self.mchId,
-		DeviceInfo:     self.deviceInfo,
-		NonceStr:       randString(self.NonceLen),
-		Body:           body,
-		Attach:         attach,
-		OutTradeNo:     outTradeNo,
-		TotalFee:       totalFee,
-		SPBillCreateIP: self.ip,
-		TimeStart:      timeStart.Format("20060102150405"),
-		TimeExpire:     timeExpire.Format("20060102150405"),
-		NotifyUrl:      notifyUrl,
-		TradeType:      string(tradeType),
-		Openid:         openId,
+		AppId:      self.AppId,
+		Mchid:      self.mchId,
+		NonceStr:   randString(self.NonceLen),
+		Body:       body,
+		Attach:     attach,
+		OutTradeNo: outTradeNo,
+		TotalFee:   totalFee,
+		TimeStart:  timeStart.Format("20060102150405"),
+		TimeExpire: timeExpire.Format("20060102150405"),
+		GoodsTag:   goodsTag,
+		NotifyUrl:  notifyUrl,
+		TradeType:  string(tradeType),
+		Openid:     openId,
 	}
 
 	sign, err := self.Sign(param)
