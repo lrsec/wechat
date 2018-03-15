@@ -48,7 +48,7 @@ type transferParam struct {
 }
 
 // 企业付款到用户零钱账户
-func (self *wechatPay) Transfer(openId string, partnerTradeNo string, amount int64, checkName CheckNameMode, receiverName string, desc string) (*TransferResponse, error) {
+func (self *wechatPay) Transfer(openId string, partnerTradeNo string, amount int64, checkName CheckNameMode, receiverName string, desc string, deviceInfo string, ip string) (*TransferResponse, error) {
 
 	if self.secureClient == nil {
 		return nil, errors.New("need create secure wechat with CA")
@@ -57,7 +57,7 @@ func (self *wechatPay) Transfer(openId string, partnerTradeNo string, amount int
 	param := &transferParam{
 		AppId:          self.AppId,
 		Mchid:          self.mchId,
-		DeviceInfo:     self.deviceInfo,
+		DeviceInfo:     deviceInfo,
 		NonceStr:       randString(self.NonceLen),
 		PartnerTradeNo: partnerTradeNo,
 		Openid:         openId,
@@ -65,7 +65,7 @@ func (self *wechatPay) Transfer(openId string, partnerTradeNo string, amount int
 		ReUserName:     receiverName,
 		Amount:         amount,
 		Desc:           desc,
-		SPBillCreateIP: self.ip,
+		SPBillCreateIP: ip,
 	}
 
 	sign, err := self.Sign(param)

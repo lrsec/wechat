@@ -18,12 +18,12 @@ const (
 type TradeType string
 
 const (
-	TRADE_TYPE_JSAPI  = "JSAPI"
-	TRADE_TYPE_NATIVE = "NATIVE"
-	TRADE_TYPE_APP    = "APP"
+	TRADE_TYPE_JSAPI  TradeType = "JSAPI"
+	TRADE_TYPE_NATIVE TradeType = "NATIVE"
+	TRADE_TYPE_APP    TradeType = "APP"
 )
 
-type unifiedOrderParam struct {
+type UnifiedOrderParam struct {
 	AppId          string `xml:"appid"`
 	Mchid          string `xml:"mch_id"`
 	DeviceInfo     string `xml:"device_info"`
@@ -62,7 +62,7 @@ type UnifiedOrderResponse struct {
 
 // 统一下单接口
 func (self *wechatPay) UnifiedOrder(openId, body, attach, goodsTag, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error) {
-	param := &unifiedOrderParam{
+	param := &UnifiedOrderParam{
 		AppId:      self.AppId,
 		Mchid:      self.mchId,
 		NonceStr:   randString(self.NonceLen),
