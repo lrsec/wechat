@@ -37,7 +37,7 @@ type transferParam struct {
 	Mchid          string `xml:"mchid"`
 	DeviceInfo     string `xml:"device_info"`
 	NonceStr       string `xml:"nonce_str"`
-	Sign           string `xml:"Sign"`
+	Sign           string `xml:"sign"`
 	PartnerTradeNo string `xml:"partner_trade_no"`
 	Openid         string `xml:"openid"`
 	CheckName      string `xml:"check_name"`

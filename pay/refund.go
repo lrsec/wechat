@@ -42,7 +42,7 @@ type RefundResponse struct {
 	AppId    string `xml:"mch_appid"`
 	MchId    string `xml:"mchid"`
 	NonceStr string `xml:"nonce_str"`
-	Sign     string `xml:"Sign"`
+	Sign     string `xml:"sign"`
 
 	TransactionId       string `xml:"transaction_id"`
 	OutTradeNo          string `xml:"out_trade_no"`

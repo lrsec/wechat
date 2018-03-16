@@ -50,7 +50,7 @@ type UnifiedOrderResponse struct {
 	MchId      string `xml:"mchid"`
 	DeviceInfo string `xml:"device_info"`
 	NonceStr   string `xml:"nonce_str"`
-	Sign       string `xml:"Sign"`
+	Sign       string `xml:"sign"`
 	ResultCode string `xml:"result_code"`
 	ErrCode    string `xml:"err_code"`
 	ErrCodeDes string `xml:"err_code_des"`
