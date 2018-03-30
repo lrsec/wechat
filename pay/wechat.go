@@ -10,7 +10,8 @@ import (
 type WechatPay interface {
 	// ============通用方法============
 	GetNonceStr() string
-	Sign(param interface{}) (string, error)
+	Sign(param interface{}) (string, error)          // 生成签名
+	VerifySign(param interface{}, sign string) error // 验签
 
 	// ============功能方法============
 	// 向用户账户转账接口

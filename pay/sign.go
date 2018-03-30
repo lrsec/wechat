@@ -25,6 +25,20 @@ func (self *wechatPay) Sign(param interface{}) (string, error) {
 	}
 }
 
+func (self *wechatPay) VerifySign(param interface{}, sign string) error {
+
+	if content, err := self.genContentStr(param); err != nil {
+		return err
+	} else {
+		createdSign := strings.ToUpper(md5Str(content))
+		if createdSign != sign {
+			return errors.New("verify sign fail")
+		}
+	}
+
+	return nil
+}
+
 func (self *wechatPay) genContentStr(param interface{}) (contentStr string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -62,6 +76,10 @@ func (self *wechatPay) genContentStr(param interface{}) (contentStr string, err 
 	sort.Strings(names)
 
 	for _, name := range names {
+		if name == "sign" {
+			continue
+		}
+
 		f := rv.Field(kv[name])
 
 		st := lt.Field(kv[name])
