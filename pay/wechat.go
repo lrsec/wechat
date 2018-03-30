@@ -21,6 +21,8 @@ type WechatPay interface {
 	UnifiedOrder(openId, body, attach, goodsTag, outTradeNo string, totalFee int64, timeStart, timeExpire time.Time, notifyUrl string, tradeType TradeType) (*UnifiedOrderResponse, error)
 	// 微信支付 - 退款接口
 	Refund(transactionId, outTradeNo, outRefundNo string, orderTotalFee, refundFee int64, notifyUrl, refundDesc string) (*RefundResponse, error)
+	// 解析回调参数
+	ParseNotifyInfo(body []byte) (*NotifyInfo, error)
 }
 
 func NewUnSecureWechatPay(mchId, appId, apiSignKey string, nonceLen int, timeout time.Duration) WechatPay {
