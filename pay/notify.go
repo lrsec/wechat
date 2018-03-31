@@ -43,9 +43,9 @@ func (self *wechatPay) ParseNotifyInfo(body []byte) (*NotifyInfo, error) {
 		return nil, err
 	}
 
-	if err := self.VerifySign(info, info.Sign); err != nil {
-		return nil, err
-	}
+	//if err := self.VerifySign(info, info.Sign); err != nil {
+	//	return nil, err
+	//}
 
 	return info, nil
 }
