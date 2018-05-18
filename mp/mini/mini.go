@@ -3,6 +3,7 @@ package mini
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -19,7 +20,7 @@ import (
 type WechatMini interface {
 	// 小程序登陆接口 https://mp.weixin.qq.com/debug/wxadoc/dev/api/api-login.html#wxloginobject
 	GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error)
-	UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (*UserInfo, error)
+	UnEncryptFromEncryptedData(encryptedData string, sessionKey string, iv string) (*UserInfo, error)
 }
 
 const (
@@ -95,27 +96,46 @@ func (mini *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCode
 	return resp, nil
 }
 
-func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (*UserInfo, error) {
-	var aesBlockDecrypter cipher.Block
-	aesBlockDecrypter, err := aes.NewCipher(sessionKey)
-	if err != nil {
-		return nil, err
-	}
-	decrypted := make([]byte, len(encryptedData))
-	aesDecrypter := cipher.NewCBCDecrypter(aesBlockDecrypter, iv)
-	aesDecrypter.CryptBlocks(decrypted, encryptedData)
+func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData string, sessionKey string, iv string) (*UserInfo, error) {
 
-	originInfo, err := base64.StdEncoding.DecodeString(string(decrypted))
+	decodedEncryptedData, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
+
+	decodedSessionKey, err := base64.StdEncoding.DecodeString(sessionKey)
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	decodedIv, err := base64.StdEncoding.DecodeString(iv)
+
+	block, err := aes.NewCipher(decodedSessionKey)
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	decrypter := cipher.NewCBCDecrypter(block, decodedIv)
+	plant := make([]byte, len(decodedEncryptedData))
+	decrypter.CryptBlocks(plant, decodedEncryptedData)
+	plant = PKCS7UnPadding(plant)
+	plant = []byte(strings.Replace(string(plant), "\a", "", -1))
 
 	userInfo := &UserInfo{}
-	err = json.Unmarshal(originInfo, userInfo)
+	err = json.Unmarshal(plant, userInfo)
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 
 	return userInfo, nil
 
+}
+
+func PKCS7UnPadding(plantText []byte) []byte {
+	length := len(plantText)
+	unPadding := int(plantText[length-1])
+	if unPadding < 1 || unPadding > 32 {
+		unPadding = 0
+	}
+	return plantText[:(length - unPadding)]
 }
