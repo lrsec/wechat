@@ -8,6 +8,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"crypto/aes"
+	"crypto/cipher"
+
+	"encoding/base64"
+
 	"github.com/juju/errors"
 )
 
@@ -50,10 +55,10 @@ type wechatMini struct {
 	client *http.Client
 }
 
-func (this *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error) {
-	url := fmt.Sprintf(get_sessionkey_url, this.appId, this.secret, jsCode)
+func (mini *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error) {
+	url := fmt.Sprintf(get_sessionkey_url, mini.appId, mini.secret, jsCode)
 
-	result, err := this.client.Get(url)
+	result, err := mini.client.Get(url)
 	if err != nil {
 		return nil, errors.Trace(err)
 	}
@@ -70,4 +75,22 @@ func (this *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCode
 	}
 
 	return resp, nil
+}
+
+func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (string, error) {
+	var aesBlockDecrypter cipher.Block
+	aesBlockDecrypter, err := aes.NewCipher(sessionKey)
+	if err != nil {
+		return "", err
+	}
+	decrypted := make([]byte, len(encryptedData))
+	aesDecrypter := cipher.NewCBCDecrypter(aesBlockDecrypter, iv)
+	aesDecrypter.CryptBlocks(decrypted, encryptedData)
+
+	originInfo, err := base64.StdEncoding.DecodeString(string(decrypted))
+	if err != nil {
+		return "", err
+	}
+
+	return string(originInfo), nil
 }
