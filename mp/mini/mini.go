@@ -19,6 +19,7 @@ import (
 type WechatMini interface {
 	// 小程序登陆接口 https://mp.weixin.qq.com/debug/wxadoc/dev/api/api-login.html#wxloginobject
 	GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error)
+	UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (string, error)
 }
 
 const (
