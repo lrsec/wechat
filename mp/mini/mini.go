@@ -19,7 +19,7 @@ import (
 type WechatMini interface {
 	// 小程序登陆接口 https://mp.weixin.qq.com/debug/wxadoc/dev/api/api-login.html#wxloginobject
 	GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCodeResponse, error)
-	UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (string, error)
+	UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (*UserInfo, error)
 }
 
 const (
@@ -32,6 +32,23 @@ type GetSessionKeyByCodeResponse struct {
 	OpenId     string `json:"openid"`      // 登陆用户 openid
 	UnionId    string `json:"unionid"`     // 登陆用户 unionid
 	SessionKey string `json:"session_key"` // 登陆用户 session_key
+}
+
+type UserInfo struct {
+	OpenId    string            `json:"openId"`
+	NickName  string            `json:"nickName"`
+	Gender    int               `json:"gender"` // 0 未知， 1 男， 2 女
+	City      string            `json:"city"`
+	Province  string            `json:"province"`
+	Country   string            `json:"country"`
+	AvatarUrl string            `json:"avatarUrl"`
+	UnionId   string            `json:"unionId"`
+	Watermark UserInfoWaterMark `json:"watermark"`
+}
+
+type UserInfoWaterMark struct {
+	Appid     string `json:"appid"`
+	Timestamp int    `json:"timestamp"`
 }
 
 func NewWechatMini(appId, secret string, client *http.Client) WechatMini {
@@ -78,11 +95,11 @@ func (mini *wechatMini) GetSessionKeyByCode(jsCode string) (*GetSessionKeyByCode
 	return resp, nil
 }
 
-func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (string, error) {
+func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData []byte, sessionKey []byte, iv []byte) (*UserInfo, error) {
 	var aesBlockDecrypter cipher.Block
 	aesBlockDecrypter, err := aes.NewCipher(sessionKey)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	decrypted := make([]byte, len(encryptedData))
 	aesDecrypter := cipher.NewCBCDecrypter(aesBlockDecrypter, iv)
@@ -90,8 +107,15 @@ func (mini *wechatMini) UnEncryptFromEncryptedData(encryptedData []byte, session
 
 	originInfo, err := base64.StdEncoding.DecodeString(string(decrypted))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(originInfo), nil
+	userInfo := &UserInfo{}
+	err = json.Unmarshal(originInfo, userInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return userInfo, nil
+
 }
